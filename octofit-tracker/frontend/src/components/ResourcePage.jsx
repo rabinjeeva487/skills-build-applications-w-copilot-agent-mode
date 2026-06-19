@@ -22,7 +22,7 @@ function normalizeItems(payload) {
   return { items: [], count: 0 }
 }
 
-export default function ResourcePage({ title, description, resourcePath }) {
+export default function ResourcePage({ title, description, resourcePath, codespacesEndpoint }) {
   const [items, setItems] = useState([])
   const [count, setCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -30,12 +30,18 @@ export default function ResourcePage({ title, description, resourcePath }) {
 
   const apiUrl = useMemo(() => {
     const codespaceName = import.meta.env.VITE_CODESPACE_NAME
-    const baseUrl = codespaceName
-      ? `https://${codespaceName}-8000.app.github.dev/api`
-      : 'http://localhost:8000/api'
+    const localUrl = `http://localhost:8000/api/${resourcePath}`
 
-    return `${baseUrl}/${resourcePath}`
-  }, [resourcePath])
+    if (!codespaceName) {
+      return localUrl
+    }
+
+    if (typeof codespacesEndpoint === 'string' && codespacesEndpoint) {
+      return codespacesEndpoint
+    }
+
+    return `https://${codespaceName}-8000.app.github.dev/api/${resourcePath}`
+  }, [codespacesEndpoint, resourcePath])
 
   useEffect(() => {
     let cancelled = false
