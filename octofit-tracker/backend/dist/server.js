@@ -16,9 +16,10 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT) || 8000;
 const codespaceName = process.env.CODESPACE_NAME;
-const apiBaseUrl = codespaceName
-    ? `https://${codespaceName}-8000.app.github.dev/api`
-    : 'http://localhost:8000/api';
+const baseUrl = codespaceName
+    ? `https://${codespaceName}-8000.app.github.dev`
+    : `http://localhost:${port}`;
+const apiBaseUrl = `${baseUrl}/api`;
 app.use((0, cors_1.default)({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express_1.default.json());
 app.use('/api/users', users_1.default);
@@ -30,6 +31,7 @@ app.get('/api/health', (_req, res) => {
     res.json({
         status: 'ok',
         service: 'octofit-backend',
+        baseUrl,
         apiBaseUrl,
         mongoDbPort: 27017,
     });
