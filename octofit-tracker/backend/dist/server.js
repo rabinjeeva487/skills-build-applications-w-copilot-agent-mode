@@ -7,21 +7,31 @@ const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
 const mongoose_1 = __importDefault(require("mongoose"));
+const activities_1 = __importDefault(require("./routes/activities"));
+const leaderboard_1 = __importDefault(require("./routes/leaderboard"));
+const teams_1 = __importDefault(require("./routes/teams"));
+const users_1 = __importDefault(require("./routes/users"));
+const workouts_1 = __importDefault(require("./routes/workouts"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = Number(process.env.PORT) || 8000;
 const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/octofit_db';
+const codespaceName = process.env.CODESPACE_NAME;
+const apiBaseUrl = codespaceName
+    ? `https://${codespaceName}-8000.app.github.dev/api`
+    : 'http://localhost:8000/api';
 app.use((0, cors_1.default)({ origin: process.env.FRONTEND_URL || 'http://localhost:5173' }));
 app.use(express_1.default.json());
+app.use('/api/users', users_1.default);
+app.use('/api/teams', teams_1.default);
+app.use('/api/activities', activities_1.default);
+app.use('/api/leaderboard', leaderboard_1.default);
+app.use('/api/workouts', workouts_1.default);
 app.get('/api/health', (_req, res) => {
-    const codespaceName = process.env.CODESPACE_NAME;
-    const baseUrl = codespaceName
-        ? `https://${codespaceName}-8000.app.github.dev`
-        : 'http://localhost:8000';
     res.json({
         status: 'ok',
         service: 'octofit-backend',
-        baseUrl,
+        apiBaseUrl,
         mongoDbPort: 27017,
     });
 });
